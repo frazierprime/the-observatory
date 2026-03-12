@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gravity with Softening Kernel — Visual Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg:      #05080f;
+    --surface: #0b0f1a;
+    --surface2:#111827;
+    --border:  #1e2535;
+    --text:    #dde3f0;
+    --muted:   #5a6480;
+
+    --acc-G:      #e8c84a;   /* gold — universal constant */
+    --acc-m1:     #60a5fa;   /* blue  — mass 1 */
+    --acc-m2:     #34d399;   /* green — mass 2 */
+    --acc-rhat:   #f472b6;   /* pink  — direction */
+    --acc-r:      #a78bfa;   /* purple — distance */
+    --acc-eps:    #fb923c;   /* orange — softening */
+    --acc-neg:    #f87171;   /* red — negative sign */
+
+    --glow-G:   rgba(232,200,74,0.10);
+    --glow-m1:  rgba(96,165,250,0.10);
+    --glow-m2:  rgba(52,211,153,0.10);
+    --glow-rhat:rgba(244,114,182,0.10);
+    --glow-r:   rgba(167,139,250,0.10);
+    --glow-eps: rgba(251,146,60,0.10);
+    --glow-neg: rgba(248,113,113,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 48px 20px 90px;
+    line-height: 1.7;
+  }
+
+  /* starfield background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 34% 7%,  rgba(255,255,255,0.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 67% 23%, rgba(255,255,255,0.3)  0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 11%, rgba(255,255,255,0.2)  0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 88%, rgba(255,255,255,0.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 72%, rgba(255,255,255,0.2)  0%, transparent 100%),
+      radial-gradient(1px 1px at 91% 60%, rgba(255,255,255,0.3)  0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 45%, rgba(255,255,255,0.15) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 77% 77%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 6%  92%, rgba(255,255,255,0.2)  0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 840px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* ── HEADER ── */
+  .page-eyebrow {
+    text-align: center;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--acc-G);
+    margin-bottom: 10px;
+    opacity: 0.8;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, var(--acc-G) 0%, #fff 60%, var(--acc-m1) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-weight: 300;
+    margin-bottom: 52px;
+  }
+
+  /* ── EQUATION CARD ── */
+  .eq-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 28px 32px;
+    margin-bottom: 44px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .eq-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg,
+      var(--acc-neg), var(--acc-G), var(--acc-m1),
+      var(--acc-m2), var(--acc-rhat), var(--acc-r), var(--acc-eps));
+  }
+
+  /* subtle glow behind equation */
+  .eq-card::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px; height: 120px;
+    background: radial-gradient(ellipse, rgba(232,200,74,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .eq-label {
+    font-size: 0.72rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 24px;
+  }
+
+  .equation {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(0.9rem, 2.8vw, 1.35rem);
+    font-weight: 600;
+    display: flex; align-items: center;
+    justify-content: center; flex-wrap: wrap; gap: 5px;
+    line-height: 1.5;
+    position: relative; z-index: 1;
+  }
+
+  .frac {
+    display: inline-flex; flex-direction: column;
+    align-items: center; vertical-align: middle; gap: 2px;
+  }
+  .frac-num, .frac-den { padding: 2px 8px; }
+  .frac-line { width: 100%; height: 2px; background: rgba(255,255,255,0.2); margin: 1px 0; }
+
+  .sym {
+    display: inline-block;
+    padding: 3px 9px; border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  .sym:hover { transform: translateY(-3px) scale(1.08); filter: brightness(1.25); }
+
+  .sym-neg  { color: var(--acc-neg);  background: var(--glow-neg);  border: 1px solid rgba(248,113,113,0.3); }
+  .sym-G    { color: var(--acc-G);    background: var(--glow-G);    border: 1px solid rgba(232,200,74,0.35); }
+  .sym-m1   { color: var(--acc-m1);   background: var(--glow-m1);   border: 1px solid rgba(96,165,250,0.3); }
+  .sym-m2   { color: var(--acc-m2);   background: var(--glow-m2);   border: 1px solid rgba(52,211,153,0.3); }
+  .sym-rhat { color: var(--acc-rhat); background: var(--glow-rhat); border: 1px solid rgba(244,114,182,0.3); }
+  .sym-r    { color: var(--acc-r);    background: var(--glow-r);    border: 1px solid rgba(167,139,250,0.3); }
+  .sym-eps  { color: var(--acc-eps);  background: var(--glow-eps);  border: 1px solid rgba(251,146,60,0.3); }
+  .sym-plain{ color: var(--muted); }
+
+  .eq-hint { margin-top: 18px; font-size: 0.8rem; color: var(--muted); font-style: italic; position: relative; z-index: 1; }
+
+  /* ── SECTION ── */
+  .section-header {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 500;
+    margin-bottom: 8px; color: var(--text);
+  }
+  .section-intro {
+    color: var(--muted); font-size: 0.88rem;
+    margin-bottom: 28px; line-height: 1.65;
+  }
+
+  /* ── ANNOTATIONS ── */
+  .annotations {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 14px; margin-bottom: 48px;
+  }
+
+  .ann-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+    border-left: 3px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .ann-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+
+  .ann-card.neg  { border-left-color: var(--acc-neg); }
+  .ann-card.G    { border-left-color: var(--acc-G); }
+  .ann-card.m1   { border-left-color: var(--acc-m1); }
+  .ann-card.m2   { border-left-color: var(--acc-m2); }
+  .ann-card.rhat { border-left-color: var(--acc-rhat); }
+  .ann-card.r    { border-left-color: var(--acc-r); }
+  .ann-card.eps  { border-left-color: var(--acc-eps); }
+
+  .ann-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .ann-symbol {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.1rem; font-weight: 700;
+    width: 44px; height: 44px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .ann-card.neg  .ann-symbol { color: var(--acc-neg);  background: var(--glow-neg); }
+  .ann-card.G    .ann-symbol { color: var(--acc-G);    background: var(--glow-G); }
+  .ann-card.m1   .ann-symbol { color: var(--acc-m1);   background: var(--glow-m1); }
+  .ann-card.m2   .ann-symbol { color: var(--acc-m2);   background: var(--glow-m2); }
+  .ann-card.rhat .ann-symbol { color: var(--acc-rhat); background: var(--glow-rhat); }
+  .ann-card.r    .ann-symbol { color: var(--acc-r);    background: var(--glow-r); }
+  .ann-card.eps  .ann-symbol { color: var(--acc-eps);  background: var(--glow-eps); }
+
+  .ann-name  { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.05em; }
+  .ann-title { font-size: 0.97rem; font-weight: 500; }
+  .ann-body  { font-size: 0.86rem; color: #b0b8cc; line-height: 1.6; }
+  .ann-unit  {
+    display: inline-block; margin-top: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem;
+    color: var(--muted); background: rgba(255,255,255,0.04);
+    padding: 2px 8px; border-radius: 4px;
+  }
+
+  /* ── NOTATION DECODER ── */
+  .reading-guide {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px; margin-bottom: 48px;
+  }
+  .reading-guide h3 {
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 16px; font-size: 1.05rem; font-weight: 500;
+  }
+  .reading-row {
+    display: flex; align-items: baseline; gap: 14px;
+    padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.87rem;
+  }
+  .reading-row:last-child { border-bottom: none; }
+  .reading-notation {
+    font-family: 'IBM Plex Mono', monospace; min-width: 150px;
+    flex-shrink: 0; color: var(--acc-eps);
+  }
+  .reading-meaning { color: #b0b8cc; }
+
+  /* ── SOFTENING EXPLAINER ── */
+  .softening-panel {
+    background: var(--surface2);
+    border: 1px solid rgba(251,146,60,0.25);
+    border-radius: 14px; padding: 28px; margin-bottom: 48px;
+    position: relative; overflow: hidden;
+  }
+  .softening-panel::before {
+    content: 'ε';
+    position: absolute; right: 24px; top: 16px;
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem; font-weight: 700;
+    color: var(--acc-eps); opacity: 0.06;
+    line-height: 1;
+  }
+  .softening-panel h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-weight: 500;
+    color: var(--acc-eps); margin-bottom: 14px;
+  }
+  .softening-panel p { font-size: 0.87rem; color: #b0b8cc; line-height: 1.7; margin-bottom: 12px; }
+  .softening-panel p:last-child { margin-bottom: 0; }
+
+  .compare-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-top: 18px;
+  }
+  @media (max-width: 540px) { .compare-row { grid-template-columns: 1fr; } }
+
+  .compare-card {
+    background: rgba(0,0,0,0.25); border-radius: 10px;
+    padding: 16px; border: 1px solid var(--border);
+  }
+  .compare-card h4 { font-size: 0.82rem; font-weight: 500; margin-bottom: 8px; font-family: 'IBM Plex Mono', monospace; }
+  .compare-card p  { font-size: 0.82rem; color: var(--muted); line-height: 1.55; }
+
+  /* ── DIAGRAM ── */
+  .diagram-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px; margin-bottom: 48px; text-align: center;
+  }
+  .diagram-wrap h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-weight: 500; margin-bottom: 22px;
+  }
+  svg.diagram { width: 100%; max-width: 580px; height: auto; }
+  .diagram-caption { font-size: 0.8rem; color: var(--muted); margin-top: 14px; font-style: italic; }
+
+  /* ── STEPS ── */
+  .steps { display: flex; flex-direction: column; gap: 18px; margin-bottom: 48px; }
+
+  .step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px 24px 24px 72px; position: relative;
+  }
+  .step-number {
+    position: absolute; left: 20px; top: 24px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--acc-G), var(--acc-eps));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.88rem; color: #05080f;
+  }
+  .step-title { font-weight: 500; margin-bottom: 10px; font-size: 0.97rem; }
+  .step-body  { font-size: 0.87rem; color: #b0b8cc; line-height: 1.7; }
+
+  .step-calc {
+    font-family: 'IBM Plex Mono', monospace;
+    background: rgba(0,0,0,0.45); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px;
+    margin: 12px 0; font-size: 0.84rem; line-height: 2.1; overflow-x: auto;
+  }
+  .c-G    { color: var(--acc-G);    font-weight: 600; }
+  .c-m1   { color: var(--acc-m1);   font-weight: 600; }
+  .c-m2   { color: var(--acc-m2);   font-weight: 600; }
+  .c-r    { color: var(--acc-r);    font-weight: 600; }
+  .c-eps  { color: var(--acc-eps);  font-weight: 600; }
+  .c-rhat { color: var(--acc-rhat); font-weight: 600; }
+  .c-neg  { color: var(--acc-neg);  font-weight: 600; }
+  .c-res  { color: #e2e8f0;         font-weight: 700; }
+  .c-note { color: var(--muted); }
+
+  .step-insight {
+    background: rgba(232,200,74,0.06);
+    border-left: 3px solid var(--acc-G);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px; margin-top: 12px;
+    font-size: 0.84rem; color: #f4e68a;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.85rem; margin-bottom: 48px;
+    background: var(--surface); border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .compare-table th {
+    background: var(--surface2); padding: 13px 16px;
+    text-align: left; font-weight: 500; color: var(--muted);
+    font-size: 0.78rem; letter-spacing: 0.07em; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-table td {
+    padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #b0b8cc; vertical-align: middle;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td:first-child { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── RESULT ── */
+  .result-box {
+    background: linear-gradient(135deg, rgba(232,200,74,0.06), rgba(96,165,250,0.06));
+    border: 1px solid rgba(232,200,74,0.25);
+    border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 40px;
+  }
+  .result-formula {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+    color: var(--text); margin: 16px 0 8px;
+    background: rgba(0,0,0,0.3); border-radius: 8px;
+    padding: 16px; display: inline-block;
+  }
+  .result-answer {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.8rem; font-weight: 700;
+    color: var(--acc-G); display: block; margin: 10px 0 4px;
+  }
+  .result-label  { color: var(--muted); font-size: 0.85rem; }
+  .plain-english {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; font-style: italic;
+    line-height: 1.9; color: var(--text); margin: 18px 0 6px;
+  }
+
+  @media (max-width: 600px) {
+    .equation { font-size: 0.82rem; gap: 3px; }
+    .sym { padding: 2px 5px; }
+    .step { padding-left: 56px; }
+    .step-number { width: 30px; height: 30px; font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <p class="page-eyebrow">Newton's Law of Universal Gravitation</p>
+  <h1 class="page-title">With Softening Kernel</h1>
+  <p class="page-subtitle">A symbol-by-symbol guide with a concrete worked example</p>
+
+  <!-- ── EQUATION ── -->
+  <div class="eq-card">
+    <div class="eq-label">The Equation</div>
+    <div class="equation">
+      <span class="sym-plain">F_gravity &nbsp;=&nbsp;</span>
+      <span class="sym sym-neg">−</span>
+      <div class="frac">
+        <div class="frac-num">
+          <span class="sym sym-G">G</span>
+          <span class="sym-plain"> · </span>
+          <span class="sym sym-m1">m₁</span>
+          <span class="sym-plain"> · </span>
+          <span class="sym sym-m2">m₂</span>
+          <span class="sym-plain"> · </span>
+          <span class="sym sym-rhat">r̂</span>
+        </div>
+        <div class="frac-line"></div>
+        <div class="frac-den">
+          <span class="sym-plain">(</span>
+          <span class="sym sym-r">r²</span>
+          <span class="sym-plain"> + </span>
+          <span class="sym sym-eps">ε²</span>
+          <span class="sym-plain">)</span>
+          <span class="sym-plain" style="font-size:0.8em; color:#8899bb"> ^(3/2)</span>
+        </div>
+      </div>
+    </div>
+    <p class="eq-hint">Each colored symbol is explained below</p>
+  </div>
+
+  <!-- ── SYMBOL ANNOTATIONS ── -->
+  <div class="section-header">What each symbol means</div>
+  <p class="section-intro">Classic gravity pulls two masses together based on how heavy they are and how far apart they sit. The <a href="https://en.wikipedia.org/wiki/N-body_simulation#Softening" style="color: #39d3c3;" target="_blank">softening kernel</a>  (ε) is a modification that prevents simulation singularity.</p>
+
+  <div class="annotations">
+
+    <div class="ann-card neg">
+      <div class="ann-header">
+        <div class="ann-symbol">−</div>
+        <div>
+          <div class="ann-name">Negative sign (out front)</div>
+          <div class="ann-title">Attractive direction</div>
+        </div>
+      </div>
+      <div class="ann-body">Gravity always pulls inward — toward the other mass — never pushes away. The minus sign encodes this: the force acts in the <em>opposite</em> direction to r̂ (which points away from the source). Without it, the formula would describe repulsion.</div>
+      <div class="ann-unit">Notation — flips the vector direction</div>
+    </div>
+
+    <div class="ann-card G">
+      <div class="ann-header">
+        <div class="ann-symbol">G</div>
+        <div>
+          <div class="ann-name">Capital G</div>
+          <div class="ann-title">Gravitational constant</div>
+        </div>
+      </div>
+      <div class="ann-body">A fixed number set by nature — the same everywhere in the universe. It's very small, which is why gravity is the weakest of the four fundamental forces. G = 6.674 × 10⁻¹¹. In simulations, G = 1 for convenience.</div>
+      <div class="ann-unit">6.674 × 10⁻¹¹ N·m²/kg²</div>
+    </div>
+
+    <div class="ann-card m1">
+      <div class="ann-header">
+        <div class="ann-symbol">m₁</div>
+        <div>
+          <div class="ann-name">m subscript 1</div>
+          <div class="ann-title">Mass of the first body</div>
+        </div>
+      </div>
+      <div class="ann-body">The mass of one of the two objects. Gravity scales with both masses equally — double the mass of either object and the force doubles. The subscript 1 just distinguishes it from the second body.</div>
+      <div class="ann-unit">kg (kilograms)</div>
+    </div>
+
+    <div class="ann-card m2">
+      <div class="ann-header">
+        <div class="ann-symbol">m₂</div>
+        <div>
+          <div class="ann-name">m subscript 2</div>
+          <div class="ann-title">Mass of the second body</div>
+        </div>
+      </div>
+      <div class="ann-body">The mass of the other object. Newton's third law: m₁ pulls m₂ with the same force that m₂ pulls m₁ — they feel equal and opposite forces regardless of whether one is a planet and the other a pebble.</div>
+      <div class="ann-unit">kg (kilograms)</div>
+    </div>
+
+    <div class="ann-card rhat">
+      <div class="ann-header">
+        <div class="ann-symbol">r̂</div>
+        <div>
+          <div class="ann-name">r-hat (r with a circumflex)</div>
+          <div class="ann-title">Unit vector — direction only</div>
+        </div>
+      </div>
+      <div class="ann-body">The hat symbol (^) over any letter always means "the direction of, with length exactly 1". r̂ points from m₁ toward m₂ (or vice versa) but carries no distance information. It tells the force <em>which way</em> to act. The −G·m₁·m₂ part tells it <em>how strongly</em>.</div>
+      <div class="ann-unit">Dimensionless — length = 1 always</div>
+    </div>
+
+    <div class="ann-card r">
+      <div class="ann-header">
+        <div class="ann-symbol">r²</div>
+        <div>
+          <div class="ann-name">r squared</div>
+          <div class="ann-title">Separation distance squared</div>
+        </div>
+      </div>
+      <div class="ann-body">The actual distance between the two masses, squared. This is the famous inverse-square law: double the distance and gravity drops to a quarter; triple it and gravity drops to a ninth. r is always a positive scalar (plain number, not a vector).</div>
+      <div class="ann-unit">m² (meters squared)</div>
+    </div>
+
+    <div class="ann-card eps">
+      <div class="ann-header">
+        <div class="ann-symbol">ε²</div>
+        <div>
+          <div class="ann-name">epsilon squared</div>
+          <div class="ann-title">Softening length (squared)</div>
+        </div>
+      </div>
+      <div class="ann-body">The softening parameter — a small constant add to prevent singularity. In pure Newtonian gravity, force → infinity as r → 0 (two objects at the exact same point). ε² puts a floor on the denominator so the force stays finite and the simulation doesn't fail catastrophically.</div>
+      <div class="ann-unit">m² (meters squared) —  ε is arbitrary</div>
+    </div>
+
+  </div>
+
+  <!-- ── NOTATION DECODER ── -->
+  <div class="section-header">Reading the notation</div>
+  <p class="section-intro">Three pieces of notation in this formula are worth unpacking separately.</p>
+
+  <div class="reading-guide">
+    <h3>Notation decoder</h3>
+    <div class="reading-row">
+      <span class="reading-notation">r̂  (r-hat)</span>
+      <span class="reading-meaning"><strong>Hat notation</strong> always means "unit vector" — same direction as r, but rescaled to length 1. It isolates direction from magnitude. r̂ = r_vector / |r_vector|.</span>
+    </div>
+    <div class="reading-row">
+      <span class="reading-notation">(r² + ε²)^(3/2)</span>
+      <span class="reading-meaning"><strong>The softened denominator.</strong> Without ε this would be r³ (since r² to the power 3/2 = r³). Adding ε² inside the brackets before raising to 3/2 blends the true distance with a minimum safe floor.</span>
+    </div>
+    <div class="reading-row">
+      <span class="reading-notation">^(3/2)</span>
+      <span class="reading-meaning"><strong>Power of 3/2</strong> — equivalent to "square root of the cube": (r²+ε²)^(3/2) = √[(r²+ε²)³]. Why 3/2? When ε=0 this recovers r³ in the denominator, which — combined with r̂ in the numerator — gives the classic 1/r² force law.</span>
+    </div>
+    <div class="reading-row">
+      <span class="reading-notation">−G·m₁·m₂·r̂</span>
+      <span class="reading-meaning"><strong>The numerator</strong> — a vector quantity (direction from r̂, scaled by masses and G). Dividing a vector by a scalar just scales its length, so F_gravity is also a vector.</span>
+    </div>
+  </div>
+
+  <!-- ── WHY SOFTENING ── -->
+  <div class="softening-panel">
+    <h3>Why the softening kernel exists</h3>
+    <p>In Newton's original formula the denominator is just r² (or equivalently r³ when combined with the unit vector). This is physically correct for real point masses — but in simulations, particles can drift to nearly the same position, making r ≈ 0 and the force astronomically large. One timestep later the entire simulation has exploded to infinity (this is sometimes referred to as a singularity).</p>
+    <p>Adding ε² inside the bracket before the exponent ensures the denominator never falls below ε³. The force is now bounded. Choose ε small (e.g. 0.01 × typical particle spacing) and the physics is accurate everywhere except at extremely close range.</p>
+    <div class="compare-row">
+      <div class="compare-card">
+        <h4 style="color:var(--acc-r)">Without softening (ε = 0)</h4>
+        <p>As r → 0, force → ∞. Two nearby particles accelerate to impossible speeds. Simulation diverges. All particles vanish to infinity in one step.</p>
+      </div>
+      <div class="compare-card">
+        <h4 style="color:var(--acc-eps)">With softening (ε > 0)</h4>
+        <p>As r → 0, force → G·m₁·m₂ / ε³. Large, but finite. Particles survive close encounters. Long-range gravity is essentially unchanged.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DIAGRAM ── -->
+  <div class="diagram-wrap">
+    <h3>Anatomy of the formula — what each part contributes</h3>
+    <svg class="diagram" viewBox="0 0 580 240" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ah-gold" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#e8c84a"/>
+        </marker>
+        <marker id="ah-pink" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#f472b6"/>
+        </marker>
+        <marker id="ah-orange" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#fb923c"/>
+        </marker>
+      </defs>
+
+      <!-- mass 1 -->
+      <circle cx="120" cy="120" r="28" fill="rgba(96,165,250,0.15)" stroke="#60a5fa" stroke-width="2"/>
+      <text x="120" y="115" text-anchor="middle" font-size="11" fill="#60a5fa" font-family="IBM Plex Mono, monospace" font-weight="600">m₁</text>
+      <text x="120" y="130" text-anchor="middle" font-size="9" fill="#5a6480" font-family="sans-serif">1 × 10¹² kg</text>
+
+      <!-- mass 2 -->
+      <circle cx="420" cy="120" r="20" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-width="2"/>
+      <text x="420" y="115" text-anchor="middle" font-size="11" fill="#34d399" font-family="IBM Plex Mono, monospace" font-weight="600">m₂</text>
+      <text x="420" y="130" text-anchor="middle" font-size="9" fill="#5a6480" font-family="sans-serif">5 × 10¹¹ kg</text>
+
+      <!-- r arrow -->
+      <line x1="150" y1="108" x2="398" y2="108" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ah-gold)"/>
+      <text x="274" y="100" text-anchor="middle" font-size="11" fill="#a78bfa" font-family="IBM Plex Mono, monospace" font-weight="600">r = 50 m</text>
+
+      <!-- r-hat arrow (force direction, pointing inward) -->
+      <line x1="390" y1="132" x2="310" y2="148" stroke="#f472b6" stroke-width="2.5" marker-end="url(#ah-pink)"/>
+      <text x="370" y="168" text-anchor="middle" font-size="10" fill="#f472b6" font-family="IBM Plex Mono, monospace">−r̂ (toward m₁)</text>
+
+      <!-- epsilon annotation -->
+      <line x1="148" y1="155" x2="200" y2="155" stroke="#fb923c" stroke-width="1.5"/>
+      <line x1="148" y1="148" x2="148" y2="162" stroke="#fb923c" stroke-width="1.5"/>
+      <line x1="200" y1="148" x2="200" y2="162" stroke="#fb923c" stroke-width="1.5"/>
+      <text x="174" y="176" text-anchor="middle" font-size="10" fill="#fb923c" font-family="IBM Plex Mono, monospace">ε = 2 m</text>
+      <text x="174" y="190" text-anchor="middle" font-size="9" fill="#5a6480" font-family="sans-serif">(softening floor)</text>
+
+      <!-- force result arrow on m2 -->
+      <line x1="400" y1="120" x2="340" y2="120" stroke="#e8c84a" stroke-width="3" marker-end="url(#ah-gold)"/>
+      <text x="368" y="112" text-anchor="middle" font-size="10" fill="#e8c84a" font-family="IBM Plex Mono, monospace" font-weight="600">F_gravity</text>
+    </svg>
+    <p class="diagram-caption">m₂ feels a force pulling it toward m₁. The yellow arrow shows direction (−r̂). Distance r goes into the denominator; ε adds the safety floor.</p>
+  </div>
+
+  <!-- ── WORKED EXAMPLE ── -->
+  <div class="section-header">Worked example — two asteroids in a simulation</div>
+  <p class="section-intro">
+    We want the gravitational force that asteroid 2 feels from asteroid 1.<br><br>
+    <strong>Given:</strong> &nbsp; G = 6.674×10⁻¹¹ &nbsp;|&nbsp; m₁ = 1×10¹² kg &nbsp;|&nbsp; m₂ = 5×10¹¹ kg<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;positions: body 1 at (0, 0) &nbsp;|&nbsp; body 2 at (40, 30) meters &nbsp;|&nbsp; ε = 2 m
+  </p>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-title">Find the separation vector and distance r</div>
+      <div class="step-body">
+        Subtract the positions to get the vector pointing from m₁ to m₂. Then find its length (r) using Pythagoras.
+        <div class="step-calc">
+          r_vector = pos₂ − pos₁ = (<span class="c-r">40</span>, <span class="c-r">30</span>) − (0, 0) = <span class="c-r">(40, 30)</span><br><br>
+          r = |r_vector| = √(<span class="c-r">40²</span> + <span class="c-r">30²</span>)<br>
+            = √(<span class="c-r">1600</span> + <span class="c-r">900</span>)<br>
+            = √<span class="c-r">2500</span>  =  <span class="c-r">50 m</span>
+        </div>
+      </div>
+      <div class="step-insight">💡 The separation vector (40, 30) tells us both the distance (50 m) and the direction. We'll use both pieces separately in the next steps.</div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-title">Compute the unit vector r̂</div>
+      <div class="step-body">
+        Divide each component of the separation vector by r to get a direction-only vector of length 1.
+        <div class="step-calc">
+          r̂ = r_vector / r<br>
+             = (<span class="c-r">40</span>, <span class="c-r">30</span>) / <span class="c-r">50</span><br>
+             = <span class="c-rhat">(0.8,  0.6)</span><br><br>
+          <span class="c-note">Check: √(0.8² + 0.6²) = √(0.64+0.36) = √1.0 = 1 ✓</span>
+        </div>
+      </div>
+      <div class="step-insight">💡 The hat-check confirms r̂ has length 1 — it carries direction only. The force will inherit this direction and then be flipped by the minus sign to point inward.</div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-title">Compute the numerator — G · m₁ · m₂</div>
+      <div class="step-body">
+        Multiply the three scalars together. This is the "strength" before we account for distance.
+        <div class="step-calc">
+          G · m₁ · m₂<br>
+          = <span class="c-G">6.674×10⁻¹¹</span> × <span class="c-m1">1×10¹²</span> × <span class="c-m2">5×10¹¹</span><br>
+          = <span class="c-G">6.674×10⁻¹¹</span> × <span class="c-res">5×10²³</span><br>
+          = <span class="c-res">3.337×10¹³  N·m²</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">4</div>
+      <div class="step-title">Compute the softened denominator — (r² + ε²)^(3/2)</div>
+      <div class="step-body">
+        First add r² and ε² inside the bracket, then raise the whole thing to the power 3/2.
+        <div class="step-calc">
+          r²  = <span class="c-r">50²</span>   =  <span class="c-r">2500</span><br>
+          ε²  = <span class="c-eps">2²</span>    =  <span class="c-eps">4</span><br><br>
+          (r² + ε²)       = <span class="c-r">2500</span> + <span class="c-eps">4</span>  =  <span class="c-res">2504</span><br><br>
+          (2504)^(3/2)  = √(2504³)<br>
+                        = √(15,700,096,000)<br>
+                        ≈  <span class="c-res">125,300  m³</span>
+        </div>
+      </div>
+      <div class="step-insight">💡 Compare: without softening the denominator would be 50³ = 125,000. With ε = 2 the denominator is 125,300 — barely different at this distance. Softening only matters when r is tiny (close to ε).</div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">5</div>
+      <div class="step-title">Divide numerator by denominator — the force magnitude</div>
+      <div class="step-body">
+        <div class="step-calc">
+          scalar force  =  numerator / denominator<br>
+                        =  <span class="c-res">3.337×10¹³</span>  /  <span class="c-res">125,300</span><br>
+                        ≈  <span class="c-res">2.663×10⁸  N</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">6</div>
+      <div class="step-title">Apply direction — multiply by −r̂</div>
+      <div class="step-body">
+        Multiply the scalar magnitude by −r̂ to get the final force vector. The minus sign flips the direction from "away" to "toward".
+        <div class="step-calc">
+          F_gravity  =  −(scalar) × r̂<br>
+                     =  −<span class="c-res">2.663×10⁸</span>  ×  <span class="c-rhat">(0.8,  0.6)</span><br><br>
+          F_x  =  −2.663×10⁸ × <span class="c-rhat">0.8</span>  =  <span class="c-neg">−2.130×10⁸ N</span><br>
+          F_y  =  −2.663×10⁸ × <span class="c-rhat">0.6</span>  =  <span class="c-neg">−1.598×10⁸ N</span><br><br>
+          <span class="c-res">F_gravity ≈ (−2.13×10⁸,  −1.60×10⁸) N</span>
+        </div>
+      </div>
+      <div class="step-insight">💡 Both components are negative because m₂ is northeast of m₁ — the force pulls m₂ back southwest toward m₁. The direction is exactly opposite to the separation vector, as expected for attraction.</div>
+    </div>
+
+  </div>
+
+  <!-- ── COMPARISON: WITH AND WITHOUT SOFTENING ── -->
+  <div class="section-header">How ε changes the result at different distances</div>
+  <p class="section-intro">Using our same two masses (G·m₁·m₂ = 3.337×10¹³), here's how the scalar force varies with r, with and without softening (ε = 2 m):</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Distance r</th>
+        <th>Without softening (r³)</th>
+        <th>With softening (r²+ε²)^(3/2)</th>
+        <th>Difference</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--acc-r)">50 m (far)</td>
+        <td>2.670×10⁸ N</td>
+        <td>2.663×10⁸ N</td>
+        <td style="color:var(--acc-m2)">~0.03% — negligible</td>
+      </tr>
+      <tr>
+        <td style="color:var(--acc-r)">10 m (medium)</td>
+        <td>3.337×10⁹ N</td>
+        <td>3.020×10⁹ N</td>
+        <td style="color:var(--acc-eps)">~9% — noticeable</td>
+      </tr>
+      <tr>
+        <td style="color:var(--acc-r)">2 m (= ε)</td>
+        <td>4.171×10¹² N</td>
+        <td>2.950×10¹¹ N</td>
+        <td style="color:var(--acc-neg)">~14× smaller — significant</td>
+      </tr>
+      <tr>
+        <td style="color:var(--acc-r)">0.1 m (very close)</td>
+        <td>3.337×10¹⁶ N</td>
+        <td>2.952×10¹¹ N</td>
+        <td style="color:var(--acc-neg)">100,000× smaller — saves the sim</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── RESULT ── -->
+  <div class="result-box">
+    <div class="result-label">Our two asteroids at r = 50 m:</div>
+    <span class="result-answer">F ≈ (−2.13, −1.60) × 10⁸ N</span>
+    <div class="result-label" style="margin-bottom:18px;">pulling m₂ back toward m₁ (southwest)</div>
+    <div class="plain-english">
+      "Pull the two masses toward each other with a strength<br>
+      proportional to both their masses and to G,<br>
+      falling off with the square of their distance —<br>
+      but never stronger than ε allows, no matter how close they get."
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
