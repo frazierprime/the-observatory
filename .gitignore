@@ -1,0 +1,6 @@
+# local artifacts
+.DS_Store
+
+# IDE
+.idea
+
