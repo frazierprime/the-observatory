@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Observatory</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #2a2f3a;
+    --text: #e6edf3;
+    --muted: #7d8590;
+
+    --accent-blue:   #79c0ff;
+    --accent-red:    #ff7b72;
+    --accent-orange: #ffa657;
+    --accent-green:  #3fb950;
+    --accent-purple: #d2a8ff;
+    --accent-teal:   #39d3c3;
+    --accent-yellow: #e3b341;
+
+    --glow-blue:   rgba(121,192,255,0.10);
+    --glow-red:    rgba(255,123,114,0.10);
+    --glow-orange: rgba(255,166,87,0.10);
+    --glow-green:  rgba(63,185,80,0.10);
+    --glow-purple: rgba(210,168,255,0.10);
+    --glow-teal:   rgba(57,211,195,0.10);
+    --glow-yellow: rgba(227,179,65,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+  }
+
+  .nav-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-teal);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 90px 20px 80px;
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent-teal);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  .hero-title {
+    font-family: 'Lora', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    letter-spacing: 0.01em;
+  }
+
+  .hero-subtitle {
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 300;
+    max-width: 480px;
+    margin: 0 auto 40px;
+  }
+
+  .hero-links {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 9px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn-primary { background: var(--accent-teal); color: #0d1117; }
+  .btn-ghost   { border: 1px solid var(--border); color: var(--muted); }
+
+  /* ── MAIN CONTAINER ── */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 120px;
+  }
+
+  /* ── SECTION ── */
+  .section { margin-top: 72px; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-family: 'Lora', serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── CARDS ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 22px 20px;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+  }
+
+  .card.blue   { border-left-color: var(--accent-blue); }
+  .card.red    { border-left-color: var(--accent-red); }
+  .card.orange { border-left-color: var(--accent-orange); }
+  .card.green  { border-left-color: var(--accent-green); }
+  .card.purple { border-left-color: var(--accent-purple); }
+  .card.teal   { border-left-color: var(--accent-teal); }
+  .card.yellow { border-left-color: var(--accent-yellow); }
+
+  .card.dim {
+    opacity: 0.4;
+    pointer-events: none;
+    border-style: dashed;
+    border-left-style: solid;
+  }
+
+  .card-header { display: flex; align-items: center; gap: 14px; }
+
+  .card-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .card.blue   .card-icon { color: var(--accent-blue);   background: var(--glow-blue); }
+  .card.red    .card-icon { color: var(--accent-red);    background: var(--glow-red); }
+  .card.orange .card-icon { color: var(--accent-orange); background: var(--glow-orange); }
+  .card.green  .card-icon { color: var(--accent-green);  background: var(--glow-green); }
+  .card.purple .card-icon { color: var(--accent-purple); background: var(--glow-purple); }
+  .card.teal   .card-icon { color: var(--accent-teal);   background: var(--glow-teal); }
+  .card.yellow .card-icon { color: var(--accent-yellow); background: var(--glow-yellow); }
+
+  .card-meta { flex: 1; }
+
+  .card-category {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 0.87rem;
+    color: #c5c3d8;
+    line-height: 1.6;
+  }
+
+  .card-arrow {
+    align-self: flex-end;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace;
+    transition: color 0.2s;
+  }
+
+  .card:hover .card-arrow { color: var(--text); }
+
+  .card-badge {
+    align-self: flex-end;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── ABOUT ── */
+  .about-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px 36px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: start;
+  }
+
+  @media (max-width: 580px) {
+    .about-box { grid-template-columns: 1fr; }
+    .nav-links { gap: 16px; }
+  }
+
+  .about-body {
+    font-size: 0.93rem;
+    color: #c5c3d8;
+    line-height: 1.75;
+  }
+
+  .about-body p + p { margin-top: 14px; }
+
+  .about-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 150px;
+  }
+
+  .about-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .about-link:hover { color: var(--text); border-color: var(--accent-teal); }
+
+  .about-link-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    width: 18px;
+    text-align: center;
+  }
+
+  /* ── CONTACT ── */
+  .contact-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .contact-text {
+    font-size: 0.93rem;
+    color: #c5c3d8;
+    max-width: 440px;
+    line-height: 1.7;
+  }
+
+  .contact-text strong { color: var(--text); }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 100px;
+    border-top: 1px solid var(--border);
+    padding: 28px 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  .footer-brand {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-teal);
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav>
+  <a class="nav-brand" href="#">the-observatory</a>
+  <ul class="nav-links">
+    <li><a href="#simulations">Simulations</a></li>
+    <li><a href="#guides">Guides</a></li>
+    <li><a href="#writing">Writing</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<div class="hero">
+  <div class="hero-eyebrow">the-observatory</div>
+  <h1 class="hero-title">Physics, Simulations &amp; Applied Mathematics</h1>
+  <p class="hero-subtitle">A portfolio of interactive simulations, technical guides, and research notes — built for learning and sharing.</p>
+  <div class="hero-links">
+    <a class="btn btn-primary" href="#simulations">View Simulations</a>
+    <a class="btn btn-ghost" href="#guides">Read the Guides</a>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<div class="container">
+
+  <!-- ── GUIDES ── -->
+  <div class="section" id="guides">
+    <div class="section-header">
+      <span class="section-title">Guides</span>
+      <span class="section-tag">Reference &amp; Theory</span>
+    </div>
+    <div class="card-grid">
+
+      <a class="card blue" href="./guides/cohesion_force_guide.html">
+        <div class="card-header">
+          <div class="card-icon">F<sub style="font-size:0.7em">c</sub></div>
+          <div class="card-meta">
+            <div class="card-category">Particle Simulation</div>
+            <div class="card-title">Cohesion Force Guide</div>
+          </div>
+        </div>
+        <div class="card-desc">Cohesive attraction between particles — distance thresholds, force profiles, and tuning parameters.</div>
+        <div class="card-arrow">open →</div>
+      </a>
+
+      <a class="card orange" href="./guides/gravity_softening_guide.html">
+        <div class="card-header">
+          <div class="card-icon">ε</div>
+          <div class="card-meta">
+            <div class="card-category">N-Body Simulation</div>
+            <div class="card-title">Gravity Softening Guide</div>
+          </div>
+        </div>
+        <div class="card-desc">Preventing singularities in N-body simulations — softening length, force law modifications, and trade-offs.</div>
+        <div class="card-arrow">open →</div>
+      </a>
+
+      <a class="card green" href="./guides/harmonic_oscillator_guide.html">
+        <div class="card-header">
+          <div class="card-icon">ω₀</div>
+          <div class="card-meta">
+            <div class="card-category">Classical Mechanics</div>
+            <div class="card-title">Harmonic Oscillator Guide</div>
+          </div>
+        </div>
+        <div class="card-desc">The simple harmonic oscillator from first principles — restoring force, angular frequency, energy, and phase space.</div>
+        <div class="card-arrow">open →</div>
+      </a>
+
+      <a class="card red" href="./guides/damped_oscillator_discriminant_guide.html">
+        <div class="card-header">
+          <div class="card-icon">Δ</div>
+          <div class="card-meta">
+            <div class="card-category">Classical Mechanics</div>
+            <div class="card-title">Damped Oscillator &amp; Discriminant</div>
+          </div>
+        </div>
+        <div class="card-desc">Under-, over-, and critically-damped regimes via the characteristic equation discriminant. Decay envelopes and Q-factor.</div>
+        <div class="card-arrow">open →</div>
+      </a>
+
+      <a class="card purple" href="./guides/order_parameter_guide.html">
+        <div class="card-header">
+          <div class="card-icon">η</div>
+          <div class="card-meta">
+            <div class="card-category">Statistical Physics</div>
+            <div class="card-title">Order Parameter Guide</div>
+          </div>
+        </div>
+        <div class="card-desc">What order parameters are, how they distinguish phases, and how they appear in Landau theory and simulation observables.</div>
+        <div class="card-arrow">open →</div>
+      </a>
+
+      <a class="card teal" href="./guides/notation_cheatsheet.html">
+        <div class="card-header">
+          <div class="card-icon">∑</div>
+          <div class="card-meta">
+            <div class="card-category">Notation</div>
+            <div class="card-title">Math &amp; Physics Notation — Cheat Sheet</div>
+          </div>
+        </div>
+        <div class="card-desc">Vectors, operators, Greek letters, decorators, subscript conventions, and famous constants — all in one place.</div>
+        <div class="card-arrow">open →</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ── SIMULATIONS ── -->
+  <div class="section" id="simulations">
+    <div class="section-header">
+      <span class="section-title">WIP - Simulations</span>
+      <span class="section-tag">Interactive &amp; Video</span>
+    </div>
+    <div class="card-grid">
+
+      <div class="card green dim">
+        <div class="card-header">
+          <div class="card-icon">∿</div>
+          <div class="card-meta">
+            <div class="card-category">Oscillations</div>
+            <div class="card-title">Harmonic Oscillator</div>
+          </div>
+        </div>
+        <div class="card-desc">Real-time simulation of simple and damped harmonic motion with phase-space trajectory visualisation.</div>
+        <div class="card-badge">coming soon</div>
+      </div>
+
+      <div class="card purple dim">
+        <div class="card-header">
+          <div class="card-icon">⬡</div>
+          <div class="card-meta">
+            <div class="card-category">N-Body</div>
+            <div class="card-title">Particle Cohesion</div>
+          </div>
+        </div>
+        <div class="card-desc">N-body simulation exploring cohesive forces, cluster formation, and emergent structure.</div>
+        <div class="card-badge">coming soon</div>
+      </div>
+
+    </div>
+  </div>
+<!-- ── WRITING ── -->
+<div class="section" id="writing">
+  <div class="section-header">
+    <span class="section-title">Writing</span>
+    <span class="section-tag">Blog &amp; Essays</span>
+  </div>
+  <div class="card-grid">
+
+    <a class="card yellow" href="https://medium.com/@joshfrazier2113/special-relativity-with-jupyter-lab-and-sympy-ecdf5c3e9109" target="_blank" rel="noopener">
+      <div class="card-header">
+        <div class="card-icon">✍</div>
+        <div class="card-meta">
+          <div class="card-category">Jan 2025 &nbsp;·&nbsp; Medium</div>
+          <div class="card-title">Special relativity with Jupyter lab and Sympy</div>
+        </div>
+      </div>
+      <div class="card-desc">Using python tools to implement equations from relativistic physics.</div>
+      <div class="card-arrow">read →</div>
+    </a>
+
+  </div>
+</div>
+  <!-- ── ABOUT ── -->
+  <div class="section" id="about">
+    <div class="section-header">
+      <span class="section-title">About</span>
+      <span class="section-tag">Background</span>
+    </div>
+    <div class="about-box">
+      <div class="about-body">
+        <p>
+        Hello! Welcome to my github homepage and portfolio.
+        I'm a machine learning engineer and weekend physics enthusiast interested in the intersection of simulation, applied mathematics, and visualisation.
+        This site collects work I build to deepen my own understanding — from first-principles derivations to running simulations of complex systems.
+        </p>
+        <p>
+          My code portfolio <strong>the-lab</strong> contains the underlying simulation engines and tooling.
+        </p>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-top: 6px;">
+        </p>
+      </div>
+      <div class="about-links">
+        <a class="about-link" href="https://github.com/frazierprime/the-lab">
+          <span class="about-link-icon">&lt;/&gt;</span> the-lab
+        </a>
+        <a class="about-link" href="https://www.linkedin.com/in/jfrazier236">
+          <span class="about-link-icon">in</span> LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONTACT ── -->
+  <div class="section" id="contact">
+    <div class="section-header">
+      <span class="section-title">Contact</span>
+      <span class="section-tag">Get in touch</span>
+    </div>
+    <div class="contact-box">
+      <div class="contact-text">
+        <strong>Open to opportunities</strong> in simulation engineering, scientific computing, and applied physics.<br>
+        Feel free to reach out about feedback, projects, collaborations, or roles.
+      </div>
+      <a class="btn btn-primary" href="mailto:frazierprime3875@gmail.com">Send a message</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <span class="footer-brand">the-observatory</span>
+  <span>·</span>
+  <a href="#simulations">Simulations</a>
+  <a href="#guides">Guides</a>
+  <a href="#writing">Writing</a>
+  <a href="#about">About</a>
+  <a href="#contact">Contact</a>
+  <span>·</span>
+  <span>Hosted on GitHub Pages</span>
+</footer>
+
+</body>
+</html>
