@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mathematical & Physics Notation — Cheat Sheet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #2a2f3a;
+    --text: #e6edf3;
+    --muted: #7d8590;
+
+    --accent-blue:   #79c0ff;
+    --accent-red:    #ff7b72;
+    --accent-orange: #ffa657;
+    --accent-green:  #3fb950;
+    --accent-purple: #d2a8ff;
+    --accent-teal:   #39d3c3;
+    --accent-yellow: #e3b341;
+
+    --glow-blue:   rgba(121,192,255,0.10);
+    --glow-red:    rgba(255,123,114,0.10);
+    --glow-orange: rgba(255,166,87,0.10);
+    --glow-green:  rgba(63,185,80,0.10);
+    --glow-purple: rgba(210,168,255,0.10);
+    --glow-teal:   rgba(57,211,195,0.10);
+    --glow-yellow: rgba(227,179,65,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+    line-height: 1.7;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; }
+
+  .page-title {
+    font-family: 'Lora', serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  .page-subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 300;
+    margin-bottom: 52px;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    font-family: 'Lora', serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    margin-top: 56px;
+  }
+  .section-header:first-of-type { margin-top: 0; }
+
+  .section-intro {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  /* ── CONVENTION CARDS ── */
+  .conv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .conv-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 20px 18px;
+    border-left: 3px solid transparent;
+    transition: transform 0.2s;
+  }
+  .conv-card:hover { transform: translateY(-2px); }
+
+  .conv-card.blue   { border-left-color: var(--accent-blue); }
+  .conv-card.red    { border-left-color: var(--accent-red); }
+  .conv-card.orange { border-left-color: var(--accent-orange); }
+  .conv-card.green  { border-left-color: var(--accent-green); }
+  .conv-card.purple { border-left-color: var(--accent-purple); }
+  .conv-card.teal   { border-left-color: var(--accent-teal); }
+  .conv-card.yellow { border-left-color: var(--accent-yellow); }
+
+  .conv-header { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+
+  .conv-symbol {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.3rem; font-weight: 700;
+    width: 52px; height: 52px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .conv-card.blue   .conv-symbol { color: var(--accent-blue);   background: var(--glow-blue); }
+  .conv-card.red    .conv-symbol { color: var(--accent-red);    background: var(--glow-red); }
+  .conv-card.orange .conv-symbol { color: var(--accent-orange); background: var(--glow-orange); }
+  .conv-card.green  .conv-symbol { color: var(--accent-green);  background: var(--glow-green); }
+  .conv-card.purple .conv-symbol { color: var(--accent-purple); background: var(--glow-purple); }
+  .conv-card.teal   .conv-symbol { color: var(--accent-teal);   background: var(--glow-teal); }
+  .conv-card.yellow .conv-symbol { color: var(--accent-yellow); background: var(--glow-yellow); }
+
+  .conv-meta { flex: 1; }
+  .conv-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+  .conv-title { font-size: 1rem; font-weight: 600; }
+  .conv-body  { font-size: 0.88rem; color: #c5c3d8; line-height: 1.65; }
+
+  .conv-example {
+    margin-top: 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.83rem;
+    line-height: 1.9;
+  }
+  .ex-label { color: var(--muted); font-family: 'Source Sans 3', sans-serif; font-size: 0.78rem; font-style: italic; display: block; margin-bottom: 2px; }
+
+  .conv-card.blue   .conv-example .hi { color: var(--accent-blue); font-weight: 600; }
+  .conv-card.red    .conv-example .hi { color: var(--accent-red);  font-weight: 600; }
+  .conv-card.orange .conv-example .hi { color: var(--accent-orange); font-weight: 600; }
+  .conv-card.green  .conv-example .hi { color: var(--accent-green);  font-weight: 600; }
+  .conv-card.purple .conv-example .hi { color: var(--accent-purple); font-weight: 600; }
+  .conv-card.teal   .conv-example .hi { color: var(--accent-teal);   font-weight: 600; }
+  .conv-card.yellow .conv-example .hi { color: var(--accent-yellow); font-weight: 600; }
+
+  /* ── REFERENCE TABLE ── */
+  .ref-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 48px;
+  }
+
+  .ref-table-wrap h3 {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  th {
+    background: rgba(255,255,255,0.03);
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 11px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #c5c3d8;
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-blue);
+    white-space: nowrap;
+    width: 140px;
+  }
+
+  td.greek-col {
+    color: var(--accent-purple);
+  }
+
+  td em { color: var(--muted); font-style: italic; font-size: 0.82rem; }
+
+  /* ── OPERATOR TABLE ── */
+  .op-table td:first-child { color: var(--accent-teal); width: 120px; }
+
+  /* ── BRACKET TABLE ── */
+  .br-table td:first-child { color: var(--accent-yellow); width: 140px; }
+
+  /* ── STEP-STYLE VISUAL EXAMPLE ── */
+  .example-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 48px;
+  }
+
+  .example-section h3 {
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+  }
+
+  .example-section p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 580px) { .compare-grid { grid-template-columns: 1fr; } }
+
+  .compare-item {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .compare-item .ci-style {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .compare-item .ci-meaning {
+    font-size: 0.83rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .compare-item .ci-example {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: #c5c3d8;
+    font-style: italic;
+  }
+
+  /* ── RESULT BOX ── */
+  .result-box {
+    background: linear-gradient(135deg, rgba(63,185,80,0.07), rgba(121,192,255,0.07));
+    border: 1px solid rgba(63,185,80,0.3);
+    border-radius: 14px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .result-box .plain-english {
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    line-height: 1.9;
+    color: var(--text);
+    margin: 10px 0;
+  }
+
+  .result-box .result-label { color: var(--muted); font-size: 0.88rem; }
+
+  /* ── RAINBOW TOP BAR ── */
+  .rainbow-bar {
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg,
+      var(--accent-blue), var(--accent-purple), var(--accent-red),
+      var(--accent-orange), var(--accent-yellow), var(--accent-green), var(--accent-teal));
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 600px) {
+    .conv-grid { grid-template-columns: 1fr; }
+    .conv-symbol { width: 44px; height: 44px; font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1 class="page-title">Mathematical &amp; Physics Notation</h1>
+  <p class="page-subtitle">A visual cheat sheet — what each typographic convention signals, with concrete examples</p>
+  <div class="rainbow-bar"></div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 1 — TYPOGRAPHY & STYLE
+  ═══════════════════════════════════════════════ -->
+  <div class="section-header">Typography &amp; Style Conventions</div>
+  <p class="section-intro">How a symbol is written — italic, bold, decorated — signals its physical meaning before the equation is even read.</p>
+
+  <div class="conv-grid">
+
+    <!-- ITALIC SCALAR -->
+    <div class="conv-card red">
+      <div class="conv-header">
+        <div class="conv-symbol"><em>x</em></div>
+        <div class="conv-meta">
+          <div class="conv-label">Italic letter</div>
+          <div class="conv-title">Scalar quantity</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        A single number — magnitude only, no direction. This is the default style for any variable. Typically, a plain italic letter is describing <em>how much</em> of something, not <em>which way</em>.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Example — kinetic energy:</span>
+        E = ½ <hi class="hi">m</hi> v²
+        <span class="ex-label" style="margin-top:6px">m = 5 kg (just a number, no direction)</span>
+      </div>
+    </div>
+
+    <!-- BOLD VECTOR -->
+    <div class="conv-card blue">
+      <div class="conv-header">
+        <div class="conv-symbol"><strong>F</strong></div>
+        <div class="conv-meta">
+          <div class="conv-label">Bold letter</div>
+          <div class="conv-title">Vector quantity</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        A quantity with both magnitude <em>and</em> direction. Bold signals that this isn't just a number — it's an arrow in space. In 2D it holds two components (x, y); in 3D it holds three (x, y, z).
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Example — Newton's second law:</span>
+        <span class="hi">F</span> = m<span class="hi">a</span>
+        <span class="ex-label" style="margin-top:6px">F = (3, −2) N  ← force pointing right and down</span>
+      </div>
+    </div>
+
+    <!-- HAT UNIT VECTOR -->
+    <div class="conv-card green">
+      <div class="conv-header">
+        <div class="conv-symbol">r̂</div>
+        <div class="conv-meta">
+          <div class="conv-label">Hat (circumflex) over letter</div>
+          <div class="conv-title">Unit vector</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        A vector whose length is exactly 1. The hat strips away magnitude and preserves only direction. Used when we want to say "in <em>this</em> direction" without implying any particular strength.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Example — gravity direction:</span>
+        F = −G m₁m₂/r² · <span class="hi">r̂</span>
+        <span class="ex-label" style="margin-top:6px">r̂ just says "pointing away from the mass"</span>
+      </div>
+    </div>
+
+    <!-- BAR MEAN -->
+    <div class="conv-card orange">
+      <div class="conv-header">
+        <div class="conv-symbol">x̄</div>
+        <div class="conv-meta">
+          <div class="conv-label">Bar (overline) over letter</div>
+          <div class="conv-title">Mean / average</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        The bar is shorthand for "take the average of all values of this quantity." Works on both scalars and vectors. This is common in statistics, thermodynamics, and multi-agent simulations.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Example — average position of a flock:</span>
+        <span class="hi">r̄</span> = (1/N) Σⱼ rⱼ
+        <span class="ex-label" style="margin-top:6px">r̄ = centroid of all bird positions</span>
+      </div>
+    </div>
+
+    <!-- DOT TIME DERIVATIVE -->
+    <div class="conv-card teal">
+      <div class="conv-header">
+        <div class="conv-symbol">ẋ</div>
+        <div class="conv-meta">
+          <div class="conv-label">Dot over letter (Newton's notation)</div>
+          <div class="conv-title">Time derivative</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        One dot = first derivative with respect to time (rate of change). Two dots = second derivative (rate of change of rate of change). This is Newton's shorthand — compact and common in mechanics.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Example — position → velocity → acceleration:</span>
+        x  → position<br>
+        <span class="hi">ẋ</span>  = dx/dt  → velocity<br>
+        <span class="hi">ẍ</span>  = d²x/dt² → acceleration
+      </div>
+    </div>
+
+    <!-- TILDE APPROX / FOURIER -->
+    <div class="conv-card purple">
+      <div class="conv-header">
+        <div class="conv-symbol">x̃</div>
+        <div class="conv-meta">
+          <div class="conv-label">Tilde over letter</div>
+          <div class="conv-title">Fourier transform or approximation</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        Context-dependent: in signal processing and physics, a tilde marks the Fourier transform of a quantity (its frequency-domain version). In other contexts it means "approximately" or a rescaled/normalized version.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Example — Fourier transform of a signal:</span>
+        f(t) → <span class="hi">f̃</span>(ω)
+        <span class="ex-label" style="margin-top:6px">f̃(ω) shows which frequencies make up f(t)</span>
+      </div>
+    </div>
+
+    <!-- ARROW VECTOR (HANDWRITING) -->
+    <div class="conv-card yellow">
+      <div class="conv-header">
+        <div class="conv-symbol">
+          <svg width="28" height="32" viewBox="0 0 28 32" style="display:inline-block;vertical-align:middle;" xmlns="http://www.w3.org/2000/svg">
+            <text x="5" y="26" font-family="JetBrains Mono, monospace" font-size="20" font-weight="700" fill="currentColor">F</text>
+            <line x1="5" y1="5" x2="21" y2="5" stroke="currentColor" stroke-width="1.5"/>
+            <polygon points="21,2 26,5 21,8" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="conv-meta">
+          <div class="conv-label">Arrow over letter</div>
+          <div class="conv-title">Vector (handwriting style)</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        The same meaning as bold — a vector with direction and magnitude. Arrow notation is common in handwritten work and introductory courses where bold is hard to write. In typeset work, bold is preferred.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Same quantity, two notations:</span>
+        <span class="hi"><svg width="16" height="18" viewBox="0 0 16 18" style="display:inline-block;vertical-align:middle;margin-bottom:2px;" xmlns="http://www.w3.org/2000/svg"><text x="1" y="15" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="currentColor">F</text><line x1="1" y1="3" x2="12" y2="3" stroke="currentColor" stroke-width="1.2"/><polygon points="12,1 15,3 12,5" fill="currentColor"/></svg></span> = m<span class="hi"><svg width="16" height="18" viewBox="0 0 16 18" style="display:inline-block;vertical-align:middle;margin-bottom:2px;" xmlns="http://www.w3.org/2000/svg"><text x="1" y="15" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="currentColor">a</text><line x1="1" y1="3" x2="12" y2="3" stroke="currentColor" stroke-width="1.2"/><polygon points="12,1 15,3 12,5" fill="currentColor"/></svg></span>   ← handwritten style<br>
+        <span class="hi">F</span> = m<span class="hi">a</span>   ← typeset style (bold)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 2 — SUBSCRIPTS & SUPERSCRIPTS
+  ═══════════════════════════════════════════════ -->
+  <div class="section-header">Subscripts &amp; Superscripts</div>
+  <p class="section-intro">Tiny raised or lowered characters carry a lot of meaning — they label, index, and exponentiate.</p>
+
+  <div class="conv-grid">
+
+    <!-- SUBSCRIPT INDEX -->
+    <div class="conv-card purple">
+      <div class="conv-header">
+        <div class="conv-symbol">rᵢ</div>
+        <div class="conv-meta">
+          <div class="conv-label">Subscript letter (i, j, k, n...)</div>
+          <div class="conv-title">Index — "the i-th one"</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        Points to a specific item in a collection. Think of it as an array index. The formula stays the same for every item — only the subscript changes. Common index letters: <em>i, j, k</em> for particles; <em>n</em> for steps.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Example — force on particle i:</span>
+        F_<span class="hi">i</span> = m · a_<span class="hi">i</span>
+        <span class="ex-label" style="margin-top:6px">i = 1 gives particle 1's force, i = 2 gives particle 2's, etc.</span>
+      </div>
+    </div>
+
+    <!-- SUBSCRIPT WORD LABEL -->
+    <div class="conv-card orange">
+      <div class="conv-header">
+        <div class="conv-symbol" style="font-size:0.85rem">F_grav</div>
+        <div class="conv-meta">
+          <div class="conv-label">Subscript word or abbreviation</div>
+          <div class="conv-title">Type label — "which kind"</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        Distinguishes between multiple forces, energies, or versions of the same symbol. Not an index — it's a name tag. Subscript words are usually italicized or written in roman (upright) text in formal notation.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Example — four forces on an agent:</span>
+        F_<span class="hi">cohesion</span>  +  F_<span class="hi">alignment</span><br>
+        +  F_<span class="hi">separation</span>  −  γ v
+      </div>
+    </div>
+
+    <!-- SUPERSCRIPT EXPONENT -->
+    <div class="conv-card red">
+      <div class="conv-header">
+        <div class="conv-symbol">r²</div>
+        <div class="conv-meta">
+          <div class="conv-label">Superscript number</div>
+          <div class="conv-title">Power / exponent</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        Raises the quantity to a power. r² means r × r. This is the universal math convention — the same in algebra, calculus, and physics.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Example — gravitational law:</span>
+        F = G m₁m₂ / <span class="hi">r²</span>
+        <span class="ex-label" style="margin-top:6px">Force falls off with the square of distance</span>
+      </div>
+    </div>
+
+    <!-- SUPERSCRIPT DERIVATIVE -->
+    <div class="conv-card teal">
+      <div class="conv-header">
+        <div class="conv-symbol" style="font-size:0.9rem">x⁽²⁾</div>
+        <div class="conv-meta">
+          <div class="conv-label">Superscript in parentheses</div>
+          <div class="conv-title">n-th derivative</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        An alternative to dot notation for higher derivatives. x⁽²⁾ means the second derivative of x — the same as ẍ. The parentheses distinguish it from a power: x² ≠ x⁽²⁾.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Comparison:</span>
+        x<span class="hi">²</span>  = x squared  (power)<br>
+        x<span class="hi">⁽²⁾</span> = d²x/dt²  (derivative)
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 3 — GREEK LETTERS
+  ═══════════════════════════════════════════════ -->
+  <div class="section-header">Greek Letters — Common Roles</div>
+  <p class="section-intro">Greek letters aren't arbitrary — each has a strong conventional meaning that most physicists and mathematicians follow.</p>
+
+  <div class="ref-table-wrap">
+    <h3>Quick-reference table</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Name</th>
+          <th>Typical use</th>
+          <th>Example</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="greek-col">α, β</td><td>alpha, beta</td><td>Angles, coefficients, gain parameters</td><td>αc = cohesion gain in a flock model</td></tr>
+        <tr><td class="greek-col">γ</td><td>gamma</td><td>Damping coefficient; Lorentz factor in relativity</td><td>−γv = drag force on a moving agent</td></tr>
+        <tr><td class="greek-col">ε, ϵ</td><td>epsilon</td><td>Small quantity; softening length; permittivity</td><td>r² + ε² prevents division-by-zero in gravity</td></tr>
+        <tr><td class="greek-col">λ</td><td>lambda</td><td>Wavelength; eigenvalue; decay constant</td><td>λ = c/f gives the wavelength of light</td></tr>
+        <tr><td class="greek-col">μ</td><td>mu</td><td>Mean of a distribution; friction coefficient; reduced mass</td><td>μk = kinetic friction coefficient</td></tr>
+        <tr><td class="greek-col">ω</td><td>omega (lower)</td><td>Angular frequency (radians per second)</td><td>ω = 2πf for a vibrating string</td></tr>
+        <tr><td class="greek-col">Ω</td><td>Omega (upper)</td><td>Solid angle; angular velocity of a rigid body</td><td>Ω = 3 rad/s for a spinning top</td></tr>
+        <tr><td class="greek-col">ρ</td><td>rho</td><td>Density (mass per volume)</td><td>ρ_water ≈ 1000 kg/m³</td></tr>
+        <tr><td class="greek-col">σ</td><td>sigma (lower)</td><td>Standard deviation; stress; cross-section</td><td>σ = 2.3 m² (scattering cross-section)</td></tr>
+        <tr><td class="greek-col">Σ</td><td>Sigma (upper)</td><td>Summation over an index</td><td>Σᵢ mᵢ = total mass of all particles</td></tr>
+        <tr><td class="greek-col">τ</td><td>tau</td><td>Torque; time constant of exponential decay</td><td>τ = r × F (rotational force)</td></tr>
+        <tr><td class="greek-col">θ, φ</td><td>theta, phi</td><td>Angles in polar / spherical coordinates</td><td>θ = 45° from the vertical axis</td></tr>
+        <tr><td class="greek-col">∇</td><td>nabla / del</td><td>Gradient, divergence, or curl operator</td><td>∇T points toward hottest region</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 4 — OPERATORS & SYMBOLS
+  ═══════════════════════════════════════════════ -->
+  <div class="section-header">Operators &amp; Special Symbols</div>
+  <p class="section-intro">These aren't variables — they're instructions indicating what operation to perform.</p>
+
+  <div class="ref-table-wrap op-table">
+    <h3>Operator reference</h3>
+    <table>
+      <thead>
+        <tr><th>Symbol</th><th>Meaning</th><th>Concrete example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>∑</td><td>Sum over all values of an index</td><td>∑ᵢ xᵢ = x₁ + x₂ + x₃ + …</td></tr>
+        <tr><td>∏</td><td>Product over all values of an index</td><td>∏ᵢ pᵢ = p₁ × p₂ × p₃ × …</td></tr>
+        <tr><td>∫</td><td>Continuous sum (integral) over a range</td><td>∫₀¹ x dx = ½</td></tr>
+        <tr><td>∂</td><td>Partial derivative — vary one variable, hold the rest fixed</td><td>∂T/∂x = how temperature changes with x, at fixed y and z</td></tr>
+        <tr><td>∇f</td><td>Gradient — vector pointing in the direction of steepest increase of f</td><td>∇T points toward the hottest spot</td></tr>
+        <tr><td>∇ · F</td><td>Divergence — how much a vector field spreads out from a point</td><td>∇ · E = ρ/ε₀ (Gauss's law)</td></tr>
+        <tr><td>∇ × F</td><td>Curl — how much a vector field rotates around a point</td><td>∇ × B = μ₀J (Ampère's law)</td></tr>
+        <tr><td>∇²</td><td>Laplacian — sum of second partial derivatives; measures local curvature</td><td>∇²ψ appears in the Schrödinger equation</td></tr>
+        <tr><td>∝</td><td>Proportional to — one quantity scales with another</td><td>F ∝ 1/r² means force halves when r doubles</td></tr>
+        <tr><td>≈</td><td>Approximately equal — useful approximation, not exact</td><td>sin θ ≈ θ for small angles</td></tr>
+        <tr><td>≡</td><td>Defined as / identically equal in all cases</td><td>v ≡ dx/dt defines velocity</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 5 — BRACKETS
+  ═══════════════════════════════════════════════ -->
+  <div class="section-header">Bracket Conventions</div>
+  <p class="section-intro">Different bracket shapes mean very different things — don't mix them up.</p>
+
+  <div class="ref-table-wrap br-table">
+    <h3>Bracket reference</h3>
+    <table>
+      <thead>
+        <tr><th>Notation</th><th>Meaning</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>|x|</td><td>Absolute value of a scalar</td><td>|−5| = 5</td></tr>
+        <tr><td>‖v‖</td><td>Norm / magnitude of a vector</td><td>‖(3, 4)‖ = 5</td></tr>
+        <tr><td>⟨x⟩</td><td>Expected value or ensemble average</td><td>⟨E⟩ = average energy across all states</td></tr>
+        <tr><td>[x]</td><td>Units of a quantity (or commutator in quantum mechanics)</td><td>[F] = kg·m/s² = N</td></tr>
+        <tr><td>f(x)</td><td>Function evaluated at x</td><td>f(3) = 3² = 9</td></tr>
+        <tr><td>{x}</td><td>Set of values (or Poisson bracket in classical mechanics)</td><td>{x₁, x₂, x₃} = set of positions</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 6 — VISUAL SIDE-BY-SIDE
+  ═══════════════════════════════════════════════ -->
+  <div class="section-header">Side-by-side: scalar vs vector in the same equation</div>
+  <p class="section-intro">The same equation can look very different depending on whether we're working with scalars or vectors — but the structure is identical.</p>
+
+  <div class="example-section">
+    <h3>Newton's second law — two forms</h3>
+    <p>One equation, two worlds.</p>
+    <div class="compare-grid">
+      <div class="compare-item">
+        <div class="ci-style" style="color: var(--accent-red)">F = ma</div>
+        <div class="ci-meaning">Scalar form — everything is a plain number. Describes motion along a single line (1D).</div>
+        <div class="ci-example">F = 10 N, m = 2 kg, a = 5 m/s²<br>Works for a ball rolling in one direction.</div>
+      </div>
+      <div class="compare-item">
+        <div class="ci-style" style="color: var(--accent-blue)">𝐅 = m𝐚</div>
+        <div class="ci-meaning">Vector form — bold letters. Describes motion in 2D or 3D — force has a direction.</div>
+        <div class="ci-example">𝐅 = (10, −4) N → push right and down<br>𝐚 = (5, −2) m/s² → accelerates right and down</div>
+      </div>
+      <div class="compare-item">
+        <div class="ci-style" style="color: var(--accent-orange)">F_i = m aᵢ</div>
+        <div class="ci-meaning">Indexed scalar — subscript i selects one particle from many. Loop over i to get every particle's force.</div>
+        <div class="ci-example">i = 1 → F₁ = 10 N (particle 1)<br>i = 2 → F₂ = 6 N (particle 2)</div>
+      </div>
+      <div class="compare-item">
+        <div class="ci-style" style="color: var(--accent-purple)">𝐅ᵢ = m 𝐚ᵢ</div>
+        <div class="ci-meaning">Indexed vector — bold + subscript. Every particle gets its own force vector with direction and magnitude.</div>
+        <div class="ci-example">𝐅₁ = (10, −4) N → particle 1 goes right-down<br>𝐅₂ = (−3, 7) N → particle 2 goes left-up</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 7 — FAMOUS CONSTANTS (CARDS)
+  ═══════════════════════════════════════════════ -->
+  <div class="section-header">Famous Constants</div>
+  <p class="section-intro">
+    Constants are written in <strong>upright (roman) type</strong> — not italic — to signal they never change.
+    A variable like <em>x</em> is italic because it varies; a constant like <span style="font-family:'JetBrains Mono',monospace; color:var(--accent-teal)">c</span> is upright because it is fixed everywhere in the universe.
+  </p>
+
+  <div class="conv-grid">
+
+    <!-- PI -->
+    <div class="conv-card teal">
+      <div class="conv-header">
+        <div class="conv-symbol">π</div>
+        <div class="conv-meta">
+          <div class="conv-label">Pi — Math fundamental</div>
+          <div class="conv-title">Ratio of circumference to diameter</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        The most famous constant in mathematics. Appears whenever circles, waves, or oscillations are involved — far beyond geometry alone.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Value:</span>
+        <span class="hi">π</span> ≈ 3.14159265…
+        <span class="ex-label" style="margin-top:6px">Example — angular frequency:</span>
+        ω = 2<span class="hi">π</span>f  (f = frequency in Hz)
+      </div>
+    </div>
+
+    <!-- EULER'S NUMBER -->
+    <div class="conv-card green">
+      <div class="conv-header">
+        <div class="conv-symbol">e</div>
+        <div class="conv-meta">
+          <div class="conv-label">Euler's number — Math fundamental</div>
+          <div class="conv-title">Base of the natural logarithm</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        The unique number whose exponential function is its own derivative. Governs all natural growth and decay — populations, radioactivity, RC circuits, damping.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Value:</span>
+        <span class="hi">e</span> ≈ 2.71828182…
+        <span class="ex-label" style="margin-top:6px">Example — damped oscillator amplitude:</span>
+        A(t) = A₀ <span class="hi">e</span><sup>−γt</sup>
+      </div>
+    </div>
+
+    <!-- SPEED OF LIGHT -->
+    <div class="conv-card blue">
+      <div class="conv-header">
+        <div class="conv-symbol">c</div>
+        <div class="conv-meta">
+          <div class="conv-label">Speed of light — Classical / Relativity</div>
+          <div class="conv-title">Maximum speed in the universe</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        The speed of light in a vacuum — exact by definition since 2019. Sets the scale for relativity and electromagnetism. Nothing with mass can reach it.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Value:</span>
+        <span class="hi">c</span> = 299,792,458 m/s  (exact)
+        <span class="ex-label" style="margin-top:6px">Example — mass-energy equivalence:</span>
+        E = m<span class="hi">c</span>²
+      </div>
+    </div>
+
+    <!-- PLANCK'S CONSTANT -->
+    <div class="conv-card purple">
+      <div class="conv-header">
+        <div class="conv-symbol">ħ</div>
+        <div class="conv-meta">
+          <div class="conv-label">Reduced Planck's constant — Quantum</div>
+          <div class="conv-title">Quantum of action</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        Written ħ ("h-bar") = h / 2π, where h is the original Planck's constant. Sets the scale at which quantum effects become significant. If ħ → 0, the universe would be classical.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Value:</span>
+        <span class="hi">ħ</span> ≈ 1.055 × 10⁻³⁴ J·s
+        <span class="ex-label" style="margin-top:6px">Example — energy of a photon:</span>
+        E = <span class="hi">ħ</span>ω
+      </div>
+    </div>
+
+    <!-- GOLDEN RATIO -->
+    <div class="conv-card yellow">
+      <div class="conv-header">
+        <div class="conv-symbol">φ</div>
+        <div class="conv-meta">
+          <div class="conv-label">Golden ratio — Math fundamental</div>
+          <div class="conv-title">The self-similar proportion</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        The ratio a/b such that (a+b)/a = a/b. Appears in Fibonacci sequences, plant growth, and certain optimization problems. Aesthetically, it describes proportions that feel "balanced."
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Value:</span>
+        <span class="hi">φ</span> = (1 + √5) / 2 ≈ 1.61803…
+        <span class="ex-label" style="margin-top:6px">Example — Fibonacci limit:</span>
+        Fₙ₊₁ / Fₙ → <span class="hi">φ</span> as n → ∞
+      </div>
+    </div>
+
+    <!-- IMAGINARY UNIT -->
+    <div class="conv-card red">
+      <div class="conv-header">
+        <div class="conv-symbol">i</div>
+        <div class="conv-meta">
+          <div class="conv-label">Imaginary unit — Math fundamental</div>
+          <div class="conv-title">√(−1)</div>
+        </div>
+      </div>
+      <div class="conv-body">
+        Not a real number — it's the building block of complex numbers. Indispensable in signal processing, quantum mechanics, and AC circuit analysis. Engineers often write <em>j</em> instead to avoid confusion with current.
+      </div>
+      <div class="conv-example">
+        <span class="ex-label">Definition:</span>
+        <span class="hi">i</span>² = −1
+        <span class="ex-label" style="margin-top:6px">Example — Euler's identity:</span>
+        e^(<span class="hi">i</span>π) + 1 = 0
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 8 — CONSTANTS REFERENCE TABLE
+  ═══════════════════════════════════════════════ -->
+  <div class="section-header">Constants — Quick Reference</div>
+  <p class="section-intro">The remaining constants are common, with their values and typical context.</p>
+
+  <div class="ref-table-wrap">
+    <h3>Math fundamentals</h3>
+    <table>
+      <thead><tr><th>Symbol</th><th>Name</th><th>Value</th><th>Where it appears</th></tr></thead>
+      <tbody>
+        <tr><td>π</td><td>Pi</td><td>≈ 3.14159…</td><td>Circles, waves, Fourier analysis, probability</td></tr>
+        <tr><td>e</td><td>Euler's number</td><td>≈ 2.71828…</td><td>Exponential growth/decay, logarithms, complex analysis</td></tr>
+        <tr><td>φ</td><td>Golden ratio</td><td>≈ 1.61803…</td><td>Fibonacci sequences, self-similar geometry</td></tr>
+        <tr><td>i</td><td>Imaginary unit</td><td>√(−1)</td><td>Complex numbers, signal processing, quantum mechanics</td></tr>
+        <tr><td>γ<sub>E</sub></td><td>Euler–Mascheroni constant</td><td>≈ 0.57722…</td><td>Number theory, special functions, harmonic series</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ref-table-wrap" style="margin-top: -32px">
+    <h3>Classical physics</h3>
+    <table>
+      <thead><tr><th>Symbol</th><th>Name</th><th>Value</th><th>Where it appears</th></tr></thead>
+      <tbody>
+        <tr><td>c</td><td>Speed of light</td><td>≈ 3 × 10⁸ m/s</td><td>Relativity, electromagnetism, optics</td></tr>
+        <tr><td>G</td><td>Gravitational constant</td><td>≈ 6.674 × 10⁻¹¹ N·m²/kg²</td><td>Newtonian gravity, orbital mechanics</td></tr>
+        <tr><td>g</td><td>Standard gravity (Earth surface)</td><td>≈ 9.807 m/s²</td><td>Weight, projectile motion, pendulums</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ref-table-wrap" style="margin-top: -32px">
+    <h3>Quantum mechanics &amp; thermodynamics</h3>
+    <table>
+      <thead><tr><th>Symbol</th><th>Name</th><th>Value</th><th>Where it appears</th></tr></thead>
+      <tbody>
+        <tr><td>h</td><td>Planck's constant</td><td>≈ 6.626 × 10⁻³⁴ J·s</td><td>Photon energy E = hf</td></tr>
+        <tr><td>ħ</td><td>Reduced Planck's constant</td><td>= h / 2π ≈ 1.055 × 10⁻³⁴ J·s</td><td>Schrödinger equation, uncertainty principle</td></tr>
+        <tr><td>k<sub>B</sub></td><td>Boltzmann constant</td><td>≈ 1.381 × 10⁻²³ J/K</td><td>Thermal energy, entropy S = k<sub>B</sub> ln Ω</td></tr>
+        <tr><td>N<sub>A</sub></td><td>Avogadro's number</td><td>≈ 6.022 × 10²³ mol⁻¹</td><td>Moles ↔ individual particles</td></tr>
+        <tr><td>R</td><td>Gas constant</td><td>≈ 8.314 J/(mol·K)</td><td>Ideal gas law PV = nRT; R = N<sub>A</sub> k<sub>B</sub></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SUMMARY
+  ═══════════════════════════════════════════════ -->
+  <div class="result-box">
+    <div class="result-label">The one-line rule for reading any equation:</div>
+    <div class="plain-english">
+      Bold or arrowed → it's a vector (has direction).<br>
+      Decorated (bar, hat, dot, tilde) → it's been transformed (averaged, normalized, differentiated, or Fourier'd).<br>
+      Subscript letter → pick one from many. Subscript word → it's a label.<br>
+      Greek letter → almost certainly a parameter, frequency, angle, or density.<br>
+      Upright (non-italic) symbol → it's a constant. It never changes.
+    </div>
+    <div class="result-label">When in doubt: look for the bold, check the subscripts, name the Greeks, and respect the constants.</div>
+  </div>
+
+</div>
+</body>
+</html>
